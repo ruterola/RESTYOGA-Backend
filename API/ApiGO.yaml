@@ -1,0 +1,862 @@
+openapi: 3.0.1
+info:
+  title: App de Gestão de Treinos - Yoga Go!
+  description: >-
+    Este documento serve para identificar a rest api da aplicação de Gestão de
+    Treinos - Yoga Go!
+  contact:
+    email: team_yogago@email.pt
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:3000/api'
+tags:
+  - name: utilizador
+    description: Operações sobre os dados dos utilizadores inscritos na aplicação.
+  - name: plano
+    description: Todos os dados referentes ao planos.
+  - name: exercicio
+    description: Todos os dados referentes aos exercícios.
+  - name: body and mind
+    description: Todos os dados referentes aos artigos, body and mind.
+paths:
+  /utilizador:
+    post:
+      tags:
+        - utilizador
+      summary: Cria um novo utilizador na aplicação.
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Utilizador'
+      responses:
+        '201':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Utilizador'
+        '400':
+          description: Erro na execução do pedido. Os dados do utilizador não são válidos.
+          content: {}
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/utilizador/{idUser}':
+    get:
+      tags:
+        - utilizador
+      summary: Obter os utilizadores através do ID.
+      operationId: getUserById
+      parameters:
+        - name: idUser
+          in: path
+          description: ID do utilizador.
+          required: true
+          schema:
+            minimum: 1
+            type: integer
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Utilizador'
+        '400':
+          description: Erro na execução do pedido.
+          content: {}
+        '404':
+          description: Nenhum utilizador com o identificador encontrado.
+          content: {}
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - utilizador
+      summary: Actualizar dados do utilizador.
+      operationId: updateUserById
+      parameters:
+        - name: idUser
+          in: path
+          description: ID do utilizador.
+          required: true
+          schema:
+            minimum: 1
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Utilizador'
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Utilizador'
+        '400':
+          description: Erro na execução do pedido.
+          content: {}
+        '404':
+          description: Nenhum utilizador com o identificador encontrado.
+          content: {}
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - utilizador
+      summary: Apagar dados do utilizador.
+      operationId: deleteUserById
+      parameters:
+        - name: idUser
+          in: path
+          description: ID do utilizador.
+          required: true
+          schema:
+            minimum: 1
+            type: integer
+      responses:
+        '204':
+          description: Utilizador apagado.
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /utilizador/all:
+    get:
+      tags:
+        - utilizador
+      summary: Obter a informação sobre todos os utilizadores.
+      operationId: getAllUsers
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaUtilizadores'
+        '400':
+          description: Erro na execução do pedido.
+          content: {}
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /utilizador/login:
+    get:
+      tags:
+        - utilizador
+      summary: Autenticação do utilizador.
+      operationId: loginUser
+      parameters:
+        - name: email
+          in: query
+          description: Email do utilizador.
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: Password do utilizador.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Autenticação com sucesso.
+          content: {}
+        '400':
+          description: Login inválido.
+          content: {}
+        '404':
+          description: Utilizador não encontrado.
+          content: {}
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /utilizador/logout:
+    get:
+      tags:
+        - utilizador
+      summary: Termina sessão.
+      operationId: logoutUser
+      parameters:
+        - name: username
+          in: query
+          description: O nome do utilizador.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Sessão terminada com sucesso.
+          content: {}
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/utilizador/resetpassword/{idUser}':
+    get:
+      tags:
+        - utilizador
+      summary: Fazer reset à password.
+      operationId: resetPassoword
+      parameters:
+        - name: idUser
+          in: path
+          description: ID do utilizador.
+          required: true
+          schema:
+            minimum: 1
+            type: integer
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+        '400':
+          description: Erro na execução do pedido. Os dados do utilizador não são válidos.
+        '404':
+          description: Utilizador não encontrado.
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /plano:
+    post:
+      tags:
+        - plano
+      summary: Cria um novo plano na aplicação.
+      operationId: createPlano
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Plano'
+      responses:
+        '201':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plano'
+        '400':
+          description: Erro na execução do pedido. Os dados do utilizador não são válidos.
+          content: {}
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/plano/{idPlano}':
+    get:
+      tags:
+        - plano
+      summary: Obter plano através do ID
+      operationId: getPlanoById
+      parameters:
+        - name: idPlano
+          in: path
+          description: ID do plano.
+          required: true
+          schema:
+            minimum: 1
+            type: integer
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plano'
+        '400':
+          description: Erro na execução do pedido.
+          content: {}
+        '404':
+          description: Nenhum utilizador com o identificador encontrado.
+          content: {}
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - plano
+      summary: Actualizar dados do plano.
+      operationId: updatePlanoById
+      parameters:
+        - name: idPlano
+          in: path
+          description: ID do utilizador.
+          required: true
+          schema:
+            minimum: 1
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Plano'
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plano'
+        '400':
+          description: Erro na execução do pedido.
+          content: {}
+        '404':
+          description: Nenhum utilizador com o identificador encontrado.
+          content: {}
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - plano
+      summary: Apagar dados do plano.
+      operationId: deletePlanoById
+      parameters:
+        - name: idPlano
+          in: path
+          description: ID do plano.
+          required: true
+          schema:
+            minimum: 1
+            type: integer
+      responses:
+        '204':
+          description: Plano apagado.
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /plano/all:
+    get:
+      tags:
+        - plano
+      summary: Obter todos os planos.
+      operationId: getAllPlanos
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaPlanos'
+        '400':
+          description: Erro na execução do pedido.
+          content: {}
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /plano/iniciar/{idUser} + {idPlano}:
+    post:
+      tags:
+        - plano
+      summary: Inicia um plano (Regista na área pessoal).
+      operationId: startSession
+      parameters:
+        - name: idUser
+          in: path
+          description: Id do utilizador.
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: idPlano
+          in: path
+          description: Id do plano.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Plano registado com sucesso.
+          content: {}
+        '404':
+          description: Erro na execução do pedido.
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /plano/terminar/{idUser} + {idPlano}:
+    post:
+      tags:
+        - plano
+      summary: Termina um plano (Regista na área pessoal)
+      operationId: closeSession
+      parameters:
+        - name: idUser
+          in: path
+          description: Id do utilizador.
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: idPlano
+          in: path
+          description: Id do plano.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Plano terminado com sucesso.
+          content: {}
+        '404':
+          description: Erro na execução do pedido.
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /exercicio:
+    post:
+      tags:
+        - exercicio
+      summary: Cria um novo exercicio na aplicação.
+      operationId: createExercicio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Exercicio'
+      responses:
+        '201':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercicio'
+        '400':
+          description: Erro na execução do pedido. Os dados do utilizador não são válidos.
+          content: {}
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/exercicio/{idExercicio}':
+    get:
+      tags:
+        - exercicio
+      summary: Obter o exercicio pelo ID.
+      operationId: getExercicoById
+      parameters:
+        - name: idExercicio
+          in: path
+          description: ID do exercicio.
+          required: true
+          schema:
+            minimum: 1
+            type: integer
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artigo'
+        '404':
+          description: Nenhum exercicio com o identificador encontrado.
+          content: {}
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - exercicio
+      summary: Actualizar dados do exercicio.
+      operationId: updateExercicioById
+      parameters:
+        - name: idExercicio
+          in: path
+          description: ID do utilizador.
+          required: true
+          schema:
+            minimum: 1
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Exercicio'
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exercicio'
+        '400':
+          description: Erro na execução do pedido.
+          content: {}
+        '404':
+          description: Nenhum exercicio com o identificador encontrado.
+          content: {}
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - exercicio
+      summary: Apagar dados do exercicio.
+      operationId: deleteExercicioById
+      parameters:
+        - name: idExercicio
+          in: path
+          description: ID do exercicio.
+          required: true
+          schema:
+            minimum: 1
+            type: integer
+      responses:
+        '204':
+          description: Exercicio apagado.
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /exercicio/all:
+    get:
+      tags:
+        - exercicio
+      summary: Obter todos os exercícios.
+      operationId: getAllExercicios
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaExercicios'
+        '400':
+          description: Erro na execução do pedido.
+          content: {}
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /bodymind:
+    post:
+      tags:
+        - body and mind
+      summary: Cria um novo artigo na aplicação.
+      operationId: createArtigo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Artigo'
+      responses:
+        '201':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artigo'
+        '400':
+          description: Erro na execução do pedido. Os dados referentes ao artigo não são válidos.
+          content: {}
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/bodymind/{idArtigo}':
+    get:
+      tags:
+        - body and mind
+      summary: Obter todos os artigos sobre Body and Mind.
+      operationId: getArtigoById
+      parameters:
+        - name: idArtigo
+          in: path
+          description: ID do artigo.
+          required: true
+          schema:
+            minimum: 1
+            type: integer
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artigo'
+        '404':
+          description: Nenhum artigo com o identificador encontrado.
+          content: {}
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - body and mind
+      summary: Actualizar dados do artigo.
+      operationId: updateArtigoById
+      parameters:
+        - name: idArtigo
+          in: path
+          description: ID do artigo.
+          required: true
+          schema:
+            minimum: 1
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Artigo'
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artigo'
+        '400':
+          description: Ocorreu um erro ao tentar atualizar o artigo.
+          content: {}
+        '404':
+          description: Nenhum artigo com o identificador encontrado.
+          content: {}
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - body and mind
+      summary: Apagar dados do artigo.
+      operationId: deleteArtigoById
+      parameters:
+        - name: idArtigo
+          in: path
+          description: ID do artigo.
+          required: true
+          schema:
+            minimum: 1
+            type: integer
+      responses:
+        '204':
+          description: Artigo apagado.
+        default:
+          description: unexpected error
+        '400':
+          description: Erro ao remover o artigo.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /bodymind/all:
+    get:
+      tags:
+        - body and mind
+      summary: Obter todos os exercícios.
+      operationId: getAllArtigos
+      responses:
+        '200':
+          description: Operação realizada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaArtigos'
+        '400':
+          description: Erro na execução do pedido.
+          content: {}
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Utilizador:
+      required:
+        - id
+        - username
+        - email
+        - password
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        planos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Plano'
+    ListaUtilizadores:
+      properties:
+        utilizadores:
+          type: array
+          items:
+            $ref: '#/components/schemas/Utilizador'
+    Plano:
+      required:
+        - id
+        - nome
+        - descricao
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        descricao:
+          type: string
+        imagem:
+          type: string
+        data:
+          type: string
+        utilizador:
+          type: integer
+          format: int64
+        ListaExercicios:
+          type: array
+          items:
+            $ref: '#/components/schemas/Exercicio'
+    ListaPlanos:
+      properties:
+        planos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Plano'
+    Exercicio:
+      required:
+        - id
+        - nome
+        - descricao
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        descricao:
+          type: string
+        imagem:
+          type: string
+        data:
+          type: string
+    ListaExercicios:
+      properties:
+        exercicios:
+          type: array
+          items:
+            $ref: '#/components/schemas/Exercicio'
+    Artigo:
+      required:
+        - id
+        - nome
+        - descricao
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        descricao:
+          type: string
+        imagem:
+          type: string
+        data:
+          type: string
+    ListaArtigos:
+      properties:
+        artigos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Artigo'
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
