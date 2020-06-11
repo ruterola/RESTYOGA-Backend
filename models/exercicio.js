@@ -3,7 +3,7 @@
 module.exports = (sequelize, DataTypes) => {
   const Exercicio = sequelize.define('Exercicio', {
     nome: DataTypes.STRING,
-    imagem: DataTypes.STRING,
+    imagem: DataTypes.BLOB,
     descricao: DataTypes.STRING,  
     planoId: DataTypes.INTEGER
   }, {
@@ -11,8 +11,7 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'exercicios'
   });
   Exercicio.associate = function(models) {
-    //OS EXERCICIOS PRETENCEM A UM PLANO ESPECIFICO (n-1)
-    Exercicio.belongsTo(models.Plano);
+    Exercicio.belongsTo(models.Plano, {foreignKey: 'planoId'});
   };
   return Exercicio;
 };

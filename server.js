@@ -4,10 +4,11 @@ const db = require ('./models');
 const PORT = process.env.PORT || 3000;
 
 app.use(express.urlencoded({ extended: true }));
-
-//MIDDLEWARE
 app.use(express.json());
 
+
+////////////////////////////////////
+//////////////////////////////VIEWS
 //ARTIGO BODY&MIND
 const Artigo = require ('./routes/artigo');
 app.use('/api', Artigo);
@@ -23,6 +24,10 @@ app.use('/api', Plano);
 //USERS
 const Utilizador = require ('./routes/utilizador');
 app.use('/api', Utilizador);
+
+//AUTHENTICATION
+const Auth = require ('./routes/auth');
+app.use('/api', Auth);
 
 
 db.sequelize.sync().then(() => {

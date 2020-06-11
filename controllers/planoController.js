@@ -1,6 +1,8 @@
 const express = require('express');
 const controllers = express.Router();
-const db = require ('../models'); 
+const {Plano} = require ('../models'); 
+const {Exercicio} = require ('../models');
+const {Atividade} = require ('../models');
 
 
 // FUNÇÃO DO ENDPOINT PLANOS
@@ -26,8 +28,11 @@ controllers.getAllPlanos = async (req, res) => {
 //GET PLANO:ID
 controllers.getPlanoById = async (req, res) => {
     const { id } = req.params;
-    const planos = await Plano.findAll({ where: { id: id } })
+    const planos = await Plano.findAll({ where: { id: id }, include: [Exercicio] })
       .then(function (planos) {
+        if (planos.length === 0) {
+          return 'Nenhum utilizador com o identificador encontrado.';
+        }
         return planos;
       })
       .catch((error) => {
@@ -38,7 +43,7 @@ controllers.getPlanoById = async (req, res) => {
   
     res.json({
       success: true,
-      exercicios: exercicios,
+      planos: planos,
     });
   };
 
@@ -51,7 +56,6 @@ controllers.createPlano = async (req, res) => {
       descricao: descricao,
     })
       .then(function (planos) {
-        console.log(planos);
         return planos;
       })
       .catch((error) => {
@@ -96,7 +100,6 @@ controllers.updatePlanoById = async (req, res) => {
       }
     )
       .then(function (planos) {
-        console.log(planos);
         return planos;
       })
       .catch((error) => {
@@ -116,54 +119,48 @@ controllers.updatePlanoById = async (req, res) => {
 
 //POST/PLANO/INICIAR ATIVIDADE
 controllers.startSession = async (req, res) => {
-    const { idUser, idPlano } = req.body;
-    const planos = await Plano.create({
-      idUser:idUser,
-      idPlano: idPlano,
-      data_start: data_start,
-      data_fin:data_fin,
-    })
-      .then(function (planos) {
-        console.log(planos);
-        return planos;
+
+    const { planoId } = req.body;
+      console.log (new Date());
+    await Atividade.update({
+        data_start:new Date()
+    },{ where: {
+      userId:req.user,
+      planoId
+    }})
+      .then(function() {
+        res.status(200).json({
+          success: true || "Plano registado com sucesso! COMEÇADO",
+        });
       })
       .catch((error) => {
         res.status(404).send({
           message: error.message || "Erro na execução do pedido.",
         });
       });
-  
-    res.status(201).json({
-      success: true,
-      planos: planos,
-    });
   };
 
 //POST/PLANO/TERMINAR ATIVIDADE
 controllers.closeSession = async (req, res) => {
-    const { idUser, idPlano } = req.body;
-    const planos = await Plano.create({
-      idUser:idUser,
-      idPlano: idPlano,
-      data_start: data_start,
-      data_fin:data_fin,
-    })
-      .then(function (planos) {
-        console.log(planos);
-        return planos;
-      })
-      .catch((error) => {
-        res.status(404).send({
-          message: error.message || "Erro na execução do pedido.",
-        });
+
+  const { planoId } = req.body;
+    console.log (new Date());
+  await Atividade.update({
+      data_fin:new Date()
+  },{ where: {
+    userId:req.user,
+    planoId
+  }})
+    .then(function() {
+      res.status(200).json({
+        success: true || "Plano registado com sucesso! TERMINADO"
       });
-  
-    res.status(201).json({
-      success: true,
-      planos: planos,
+    })
+    .catch((error) => {
+      res.status(404).send({
+        message: error.message || "Erro na execução do pedido.",
+      });
     });
-  };
-  
-  //GETID?! DA ATIVIDADE 
+};
 
 module.exports = controllers;

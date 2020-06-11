@@ -1,3 +1,4 @@
+const {Artigo} = require ('../models'); 
 const express = require('express');
 const controllers = express.Router();
 
@@ -14,8 +15,6 @@ controllers.getAllArtigos = async (req, res) => {
           message: error.message || "Erro na execução do pedido.",
         });
       });
-      
-      console.log(artigos);
       res.json({
         success: true,
         artigos: artigos,
@@ -27,6 +26,9 @@ controllers.getArtigoById = async (req, res) => {
     const { id } = req.params;
     const artigos = await Artigo.findAll({ where: { id: id } })
       .then(function (artigos) {
+        if (artigos.length === 0) {
+          return 'Nenhum artigo com o identificador encontrado.';
+        }
         return artigos;
       })
       .catch((error) => {
@@ -50,7 +52,6 @@ controllers.createArtigo = async (req, res) => {
       descricao: descricao,
     })
       .then(function (artigos) {
-        console.log(artigos);
         return artigos;
       })
       .catch((error) => {
@@ -95,7 +96,6 @@ controllers.updateArtigoById = async (req, res) => {
       }
     )
       .then(function (artigos) {
-        console.log(artigos);
         return artigos;
       })
       .catch((error) => {

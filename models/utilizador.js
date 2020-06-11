@@ -9,11 +9,8 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: true,
     tableName: 'utilizadores'
   });
-  Utilizador.associate = function(models) {
-      // associations can be defined here
-
-    //UM UTILIZADOR PODE TER ASSOCIADO VÁRIOS PLANOS (1-n)
-    Utilizador.belongsTo(models.Atividade);
-  };
+   Utilizador.associate = function(models) {
+    Utilizador.hasMany(models.Atividade,  {foreignKey: 'userId'});
+  }; 
   return Utilizador;
 };

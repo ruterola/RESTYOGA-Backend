@@ -10,5 +10,9 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: false,
     tableName: 'atividades'
   });
+  Atividade.associate = function (models) {
+    Atividade.belongsTo(models.Utilizador, { foreignKey: 'userId' });
+    Atividade.belongsTo(models.Plano, { foreignKey: 'planoId' });
+  };
   return Atividade;
 };

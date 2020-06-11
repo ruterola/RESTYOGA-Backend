@@ -1,6 +1,7 @@
 const express = require('express');
 const controllers = express.Router();
-const db = require ('../models'); 
+const {Exercicio} = require ('../models'); 
+const {Plano} = require ('../models'); 
 
 
 // FUNÇÃO DO ENDPOINT EXERCICIO
@@ -15,8 +16,6 @@ controllers.getAllExercicios = async (req, res) => {
           message: error.message || "Erro na execução do pedido.",
         });
       });
-      
-      console.log(exercicios);
       res.json({
         success: true,
         exercicios: exercicios,
@@ -26,8 +25,11 @@ controllers.getAllExercicios = async (req, res) => {
 //GET EXERCICIO BY:ID
 controllers.getExercicoById = async (req, res) => {
     const { id } = req.params;
-    const artigos = await Exercicio.findAll({ where: { id: id } })
+    const exercicios = await Exercicio.findAll({ where: { id: id }, include: [Plano] })
       .then(function (exercicios) {
+        if (exercicios.length === 0) {
+          return 'Nenhum exercicio com o identificador encontrado.';
+        }
         return exercicios;
       })
       .catch((error) => {

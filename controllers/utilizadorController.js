@@ -1,6 +1,7 @@
 const express = require('express');
 const controllers = express.Router();
-const db = require ('../models');
+const {Utilizador} = require ('../models'); 
+const {Atividade} = require ('../models'); 
 
 
 // FUNÇÃO DO ENDPOINT UTILIZADOR
@@ -16,7 +17,6 @@ controllers.getAllUsers = async (req, res) => {
         });
       });
       
-      console.log(utilizadores);
       res.json({
         success: true,
         utilizadores: utilizadores,
@@ -25,46 +25,29 @@ controllers.getAllUsers = async (req, res) => {
 
 //GET UTILIZADOR BY:ID
 controllers.getUserById = async (req, res) => {
-    const { id } = req.params;
-    const utilizadores = await Utilizador.findAll({ where: { id: id } })
-      .then(function (utilizadores) {
-        return utilizadores;
-      })
-      .catch((error) => {
-        res.status(404).send({
-          message: error.message || "Nenhum utilizador com o identificador encontrado.",
-        });
+  const { id } = req.params;
+  const utilizadores = await Utilizador.findAll({ where: { id: id }, include: [Atividade] })
+    .then(function (utilizadores) {
+
+      if (utilizadores.length === 0) {
+        return 'Nenhum utilizador com o identificador encontrado.';
+      }
+      return utilizadores;
+    })
+    .catch((error) => {
+      res.status(404).send({
+        message: error.message || "Erro na execução do pedido",
       });
-  
-    res.json({
-      success: true,
-      utilizadores: utilizadores,
     });
-  };
+
+  res.json({
+    success: true,
+    utilizadores: utilizadores,
+  });
+};
 
 //POST UTILIZADOR
-controllers.createUser = async (req, res) => {
-    const { name, email, password } = req.body;
-    const utilizadores = await Utilizador.create({
-      name: name,
-      email: email,
-      password: password,
-    })
-      .then(function (utilizadores) {
-        console.log(utilizadores);
-        return utilizadores;
-      })
-      .catch((error) => {
-        res.status(400).send({
-          message: error.message || "Erro na execução do pedido. Os dados referentes ao utilizador não são válidos.",
-        });
-      });
-  
-    res.status(201).json({
-      success: true,
-      utilizadores: utilizadores,
-    });
-  };
+///AUTH
 
 //DELETE UTILIZADOR:ID
 controllers.deleteUserById = async (req, res) => {
@@ -96,7 +79,6 @@ controllers.updateUserById = async (req, res) => {
       }
     )
       .then(function (utilizadores) {
-        console.log(utilizadores);
         return utilizadores;
       })
       .catch((error) => {
@@ -110,9 +92,5 @@ controllers.updateUserById = async (req, res) => {
       utilizadores: utilizadores,
     });
   };
-
-  /////////////////PASS SEGURA
-  //LOGIN + LOGOUT 
-  //RESET
 
 module.exports = controllers;
