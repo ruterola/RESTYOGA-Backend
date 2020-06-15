@@ -1,5 +1,5 @@
 # RESTYOGA
-apirest
+
 <h3>Backend YOGAGO</h3>
 <strong>App de Gestão de Treinos - Yoga Go!</strong>
 <p>Projecto Desenvolvido na unidade curricular de Programação III, da Licenciatura de Multimédia do <a href="https://ismt.pt/">ISMT</a></p>
