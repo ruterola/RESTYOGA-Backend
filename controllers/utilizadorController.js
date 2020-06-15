@@ -1,7 +1,6 @@
 const express = require('express');
 const controllers = express.Router();
-const {Utilizador} = require ('../models'); 
-const {Atividade} = require ('../models'); 
+const {Utilizador, Atividade, Plano} = require ('../models'); 
 
 
 // FUNÇÃO DO ENDPOINT UTILIZADOR
@@ -26,7 +25,7 @@ controllers.getAllUsers = async (req, res) => {
 //GET UTILIZADOR BY:ID
 controllers.getUserById = async (req, res) => {
   const { id } = req.params;
-  const utilizadores = await Utilizador.findAll({ where: { id: id }, include: [Atividade] })
+  const utilizadores = await Utilizador.findOne({ where: { id: id } })
     .then(function (utilizadores) {
 
       if (utilizadores.length === 0) {
@@ -39,10 +38,23 @@ controllers.getUserById = async (req, res) => {
         message: error.message || "Erro na execução do pedido",
       });
     });
+    const atividades = await Atividade.findAll({ where: { userId: id }, include: [Plano] })
+    .then(function (atividades) {
+
+      if (atividades.length === 0) {
+        return 'Nenhuma atividade com o utilizador identificado.';
+      }
+      return atividades;
+    })
+    .catch((error) => {
+      res.status(404).send({
+        message: error.message || "Erro na execução do pedido",
+      });
+    });
 
   res.json({
     success: true,
-    utilizadores: utilizadores,
+    utilizadores: {utilizadores, atividades}
   });
 };
 

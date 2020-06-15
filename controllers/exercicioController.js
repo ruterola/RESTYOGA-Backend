@@ -2,6 +2,7 @@ const express = require('express');
 const controllers = express.Router();
 const {Exercicio} = require ('../models'); 
 const {Plano} = require ('../models'); 
+const path = require('path');
 
 
 // FUNÇÃO DO ENDPOINT EXERCICIO
@@ -46,11 +47,12 @@ controllers.getExercicoById = async (req, res) => {
 
 //POST EXERCICIO
 controllers.createExercicio = async (req, res) => {
-    const { nome, imagem, descricao } = req.body;
+    const { nome, imagem, descricao, planoId } = req.body;
     const exercicios = await Exercicio.create({
       nome: nome,
       imagem: imagem,
       descricao: descricao,
+      planoId: planoId
     })
       .then(function (exercicios) {
         console.log(exercicios);
@@ -86,11 +88,12 @@ controllers.deleteExercicioById = async (req, res) => {
 //UPDATE ARTIGO:ID
 controllers.updateExercicioById = async (req, res) => {
     const { id } = req.params;
-    const { nome, imagem, descricao } = req.body;
+    const { nome, descricao } = req.body;
+    console.log(req.file);
     const exercicios = await Exercicio.update(
       {
         nome: nome,
-        imagem: imagem,
+        imagem: req.file.path,
         descricao: descricao,
       },
       {
@@ -111,6 +114,26 @@ controllers.updateExercicioById = async (req, res) => {
       success: true,
       exercicios: exercicios,
     });
+  };
+
+  //GET EXERCICO IMAGEM BY:ID
+
+  controllers.getImage = async (req, res) => {
+    const { id } = req.params;
+    const pathImage = await Exercicio.findOne({ where: { id: id } })
+      .then(function (exercicios) {
+        if (exercicios.length === 0) {
+          return 'Nenhum exercicio com o identificador encontrado.';
+        }
+        console.log(exercicios);
+        return exercicios.dataValues.imagem;
+      })
+      .catch((error) => {
+        res.status(404).send({
+          message: error.message || "Nenhum exercicio com o identificador encontrado.",
+        });
+      });
+      res.sendFile(path.join(__dirname, '../', pathImage));
   };
 
 module.exports = controllers;

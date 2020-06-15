@@ -8,7 +8,7 @@ exports.ensureAuthenticated = function(req, res, next) {
       .send({message: "Não estás autorizado!"});
   }
   
-  var token = req.headers.authorization.split(" ")[1];
+  var token = req.headers.authorization;
   var payload = jwt.decode(token, config.TOKEN_SECRET);
   
   if(payload.exp <= moment().unix()) {

@@ -1,5 +1,6 @@
 var service = require('../service/service');
 const {Utilizador} = require ('../models'); 
+const {Atividade} = require ('../models');
 
 exports.registo = function(req, res) {
     const { name, email, password } = req.body;
@@ -9,7 +10,7 @@ exports.registo = function(req, res) {
       password: password
     })
       .then(function (utilizadores) {
-        return res.status(201).json({
+        return res.status(200).json({
           success: true,
           utilizadores: utilizadores
         });
@@ -19,11 +20,6 @@ exports.registo = function(req, res) {
           message: error.message || "Erro na execução do pedido. Os dados referentes ao utilizador não são válidos."
         });
       });
-  
-    res.status(201).json({
-      success: true,
-      utilizadores: utilizadores
-    });
   };
 
 
@@ -31,7 +27,7 @@ exports.registo = function(req, res) {
 exports.login = function(req, res) {
     const { email, password } = req.body;
     console.log(req.body);
-    Utilizador.findOne({ where: { email }})
+    Utilizador.findOne({ where: { email }, include: [Atividade]})
       .then(function (utilizador) {
         console.log(utilizador.dataValues);  
         if (!utilizador || utilizador.dataValues.password != password) {  
@@ -41,7 +37,7 @@ exports.login = function(req, res) {
         }
         return res
         .status(200)
-        .send({token: service.createToken(utilizador.dataValues.id)});
+        .send({token: service.createToken(utilizador.dataValues.id), utilizador: utilizador})
       })
       .catch((error) => {
         res.status(404).send({
@@ -55,8 +51,7 @@ exports.resetpassword = function(req, res) {
   const { email, password, confirmPassword } = req.body;
   console.log(req.body);
   Utilizador.findOne({ where: { email }})
-    .then(function (utilizador) {
-      console.log(utilizador.dataValues);  
+    .then(function (utilizador) {  
       if (!utilizador) {  
           return res.status(404).send({
                   message:"Nenhum utilizador com o identificador encontrado."
@@ -79,12 +74,6 @@ exports.resetpassword = function(req, res) {
         .status(200)
         .send({success: true});
       })
-      
-      .catch((error) => {
-        return res.status(404).send({
-          message: error.message || "Erro na execução do pedido"
-        });
-      });
   })
 
   .catch((error) => {

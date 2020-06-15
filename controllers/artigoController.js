@@ -1,6 +1,7 @@
 const {Artigo} = require ('../models'); 
 const express = require('express');
 const controllers = express.Router();
+const path = require('path');
 
 
 // FUNÇÃO DO ENDPOINT ARTIGO
@@ -84,11 +85,12 @@ controllers.deleteArtigoById = async (req, res) => {
 //UPDATE ARTIGO:ID
 controllers.updateArtigoById = async (req, res) => {
     const { id } = req.params;
-    const { nome, imagem, descricao } = req.body;
+    const { nome, descricao } = req.body;
+  console.log(req.file);
     const artigos = await Artigo.update(
       {
         nome: nome,
-        imagem: imagem,
+        imagem: req.file.path,
         descricao: descricao,
       },
       {
@@ -109,5 +111,24 @@ controllers.updateArtigoById = async (req, res) => {
       artigos: artigos,
     });
   };
+
+  //GET ARTIGO IMAGEM BY:ID
+controllers.getImage = async (req, res) => {
+  const { id } = req.params;
+  const pathImage = await Artigo.findOne({ where: { id: id } })
+    .then(function (artigos) {
+      if (artigos.length === 0) {
+        return 'Nenhum artigo com o identificador encontrado.';
+      }
+      console.log(artigos);
+      return artigos.dataValues.imagem;
+    })
+    .catch((error) => {
+      res.status(404).send({
+        message: error.message || "Nenhum artigo com o identificador encontrado.",
+      });
+    });
+    res.sendFile(path.join(__dirname, '../', pathImage));
+};
 
 module.exports = controllers;

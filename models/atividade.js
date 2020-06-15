@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     data_start: DataTypes.DATE,
     data_fin: DataTypes.DATE,
   }, {
-    timestamps: false,
+    timestamps: true,
     tableName: 'atividades'
   });
   Atividade.associate = function (models) {

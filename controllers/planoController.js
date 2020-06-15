@@ -3,6 +3,7 @@ const controllers = express.Router();
 const {Plano} = require ('../models'); 
 const {Exercicio} = require ('../models');
 const {Atividade} = require ('../models');
+const path = require('path');
 
 
 // FUNÇÃO DO ENDPOINT PLANOS
@@ -53,7 +54,7 @@ controllers.createPlano = async (req, res) => {
     const planos = await Plano.create({
       nome: nome,
       imagem: imagem,
-      descricao: descricao,
+      descricao: descricao
     })
       .then(function (planos) {
         return planos;
@@ -66,7 +67,7 @@ controllers.createPlano = async (req, res) => {
   
     res.status(201).json({
       success: true,
-      planos: planos,
+      planos: planos
     });
   };
 
@@ -88,11 +89,11 @@ controllers.deletePlanoById = async (req, res) => {
 //UPDATE PLANO:ID
 controllers.updatePlanoById = async (req, res) => {
     const { id } = req.params;
-    const { nome, imagem, descricao } = req.body;
+    const { nome, descricao } = req.body;
     const planos = await Plano.update(
       {
         nome: nome,
-        imagem: imagem,
+        imagem: req.file.path,
         descricao: descricao,
       },
       {
@@ -114,6 +115,27 @@ controllers.updatePlanoById = async (req, res) => {
     });
   };
 
+    //GET PLANO IMAGEM BY:ID
+
+    controllers.getImage = async (req, res) => {
+      const { id } = req.params;
+      const pathImage = await Plano.findOne({ where: { id: id } })
+        .then(function (planos) {
+          if (planos.length === 0) {
+            return 'Nenhum exercicio com o identificador encontrado.';
+          }
+          console.log(planos);
+          return planos.dataValues.imagem;
+        })
+        .catch((error) => {
+          res.status(404).send({
+            message: error.message || "Nenhum plano com o identificador encontrado.",
+          });
+        });
+        res.sendFile(path.join(__dirname, '../', pathImage));
+    };
+  
+
 ///////////////////////////////
 /////////////////////ATIVIDADE
 
@@ -122,12 +144,11 @@ controllers.startSession = async (req, res) => {
 
     const { planoId } = req.body;
       console.log (new Date());
-    await Atividade.update({
-        data_start:new Date()
-    },{ where: {
-      userId:req.user,
-      planoId
-    }})
+    await Atividade.create({
+        data_start:new Date(),
+        userId:req.user,
+        planoId
+    })
       .then(function() {
         res.status(200).json({
           success: true || "Plano registado com sucesso! COMEÇADO",

@@ -3,7 +3,7 @@
 module.exports = (sequelize, DataTypes) => {
   const Plano = sequelize.define('Plano', {
     nome: DataTypes.STRING,
-    imagem: DataTypes.BLOB,
+    imagem: DataTypes.STRING,
     descricao: DataTypes.STRING
   }, {
     timestamps: true,
