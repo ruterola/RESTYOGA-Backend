@@ -25,11 +25,5 @@ sequelize -> Sequelize is a promise-based Node.js
 </pre>
 <br>
 <br>
-<h2>Autores</h2>
-<br>
-<p>Luís Fonseca</p>
-<p>Sara Furtado</p>
-<p>Rute Rôla</p>
-<br>
 <h2>Docente</h2>
 <p>Frederico Fonseca</p>
